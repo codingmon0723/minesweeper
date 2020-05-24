@@ -280,5 +280,175 @@ void Main_OnRbuttondown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlag
 	int cnt = 0;
 	Right_Button_Down = FALSE;
 
+	if (Game_End == FALSE){
+		if (!(Game_Size.left >= x || Game_Size.right <= x || Game_Size.top >= y || Game_Size.bottom <= y)){
+			Row = (x - 12 / 16);
+			Col = (y - 55) / 16;
+			Right_Button_Down = TRUE;
+		}
 
+		if (Right_Button_Down == TRUE){
+			if (Left_Button_State == FALSE){
+				if (Block[Row][Col].IsOpen == CLOSE){
+					Block[Row][Col].IsOpen = FLAG;
+				}
+				else if (Block[Row][Col].IsOpen == FLAG){
+					Block[Row][Col].IsOpen = QUESTION;
+				}
+				else if (Block[Row][Col].IsOpen == QUESTION){
+					Block[Row][Col].IsOpen = CLOSE;
+				}
+				Remain_Mine = Mine_Total;
+				for (int i = 0; i < Main_ROW; i++){
+					for (int j = 0; j < Main_COL; j++){
+						if (Block[i][j].IsOpen == FLAG){
+							Remain_Mine--;
+						}
+					}
+				}
+			}
+			else{
+				Right_Button_State = RCLOSE;
+			}
+		}
+		Game_Win(hwnd);
+	}
+	InvalidateRect(hwnd, NULL, FALSE);
+}
+
+void Main_OnCommand(HWND hwnd, int ID, HWND hwndCtl, UINT codeNotify){
+	char str[256];
+
+	switch (ID){
+	case ID_MENU_START:
+		DeleteBlock();
+		InsertFlag = FALSE;
+		Init(hwnd);
+		KillTimer(hwnd, 1);
+		TimeCount = 0;
+		break;
+	case ID_MENU_SAVE:
+		if (Game_End){
+			MessageBox(hwnd, "게임이 끝났습니다. \n\n 저장 불가", "저장불가", MB_OK);
+			if ((MessageBox(hwnd, "새로 게임을 하시겠습니까?", "새게임", MB_YESNO)) == IDYES){
+				InsertFlag = FALSE;
+				InitializeBorder();
+				Init(hwnd);
+				KillTiemr(hwnd, 1);
+				TimeCount = 0;
+			}
+		}
+		else
+			GameSave();
+		break;
+	case ID_MENU_LOAD:
+		if (GameLoad()){
+			InsertFlag = FALSE;
+			MenuCheck(hwnd, Menu_Checked1);
+			Create_Window(hwnd);
+			InvalidateRect(hwnd, NULL, FALSE);
+			hTimer = (HANDLE)SetTimer(hwnd, 1, 1000, NULL);
+		}
+		break;
+	case ID_MENU_PRIMARY:
+		DeleteBlock();
+		
+		MenuCheck(hwnd, ID_MENU_PRIMARY);
+
+		InsertFlag = FALSE;
+		Main_COL = 10;
+		Main_ROW = 10;
+		Mine_Total = 10;
+		Undo_Total = 10;
+		Game_Flag = GetPrivateProfileInt("SAVELOAD", "Game_Flag", 0, "Mine.ini");
+		Game_Level = PRIMARY;
+		Init(hwnd);
+		KillTimer(hwnd, 1);
+		TimeCount = 0;
+		SaveOption();
+
+		break;
+
+	case ID_MENU_INTERMEDIATE:
+		DeleteBlock();
+
+		MenuCheck(hwnd, ID_MENU_INTERMEDIATE);
+
+		InsertFlag = FALSE;
+		Main_COL = 16;
+		Main_ROW = 16;
+		Mine_Total = 40;
+		Undo_Total = 5;
+		Game_Flag = GetPrivateProfileInt("SAVELOAD", "Game_Flag", 0, "Mine.ini");
+		Game_Level = INTERMEDIATE;
+		Init(hwnd);
+		KillTimer(hwnd, 1);
+		TimeCount = 0;
+		SaveOption();
+
+		break;
+	case ID_MENU_ADVANCED:
+		DeleteBlock();
+
+		MenuCheck(hwnd, ID_MENU_INTERMEDIATE);
+
+		InsertFlag = FALSE;
+		Main_COL = 16;
+		Main_ROW = 30;
+		Mine_Total = 99;
+		Undo_Total = 1;
+		Game_Flag = GetPrivateProfileInt("SAVELOAD", "Game_Flag", 0, "Mine.ini");
+		Game_Level = ADVANCED;
+		Init(hwnd);
+		KillTimer(hwnd, 1);
+		TimeCount = 0;
+		SaveOption();
+
+		break;
+	case ID_MENU_USER:
+		if (DialogBox(g_hInstance, MAKEINTERSOURCE(OPTION_DIALOG), hwnd, (DLGPROC)InfoDloProc) == IDOK){
+				MenuCheck(hwnd, ID_MENU_USER);
+				Game_Level = USER;
+				SaveOption();
+				Init(hwnd);
+				KillTimer(hwnd, 1);
+				TimeCount = 0;
+				InvalidateRect(hwnd, NULL, FALSE);
+		}
+		break;
+	case ID_MENU_EXIT:
+		SendMessage(hwnd, WM_CLOSE, 0, 0);
+		break;
+	case ID_MENU_UNDO:
+		if (Remain_Undo >= 0 && InsertFlag){
+			UndoBlock();
+
+			if (Game_End == TRUE){
+				Game_End = FALSE;
+				hTimer = (HANDLE)SetTimer(hwnd, 1, 1000, NULL);
+			}
+
+			Remain_Mine = Mine_Total;
+			for (int i = 0; i < Main_ROW; i++){
+				for (int j = 0; j < Main_COL; j++){
+					if (Block[i][j].IsOpen == FLAG){
+						Remain_Mine--;
+					}
+				}
+			}
+			wsprintf(str, "되돌릴수 있는 공간이 \n %d개 있습니다.", Remain_Undo + 1);
+			MessageBox(hwnd, str, "알림", MB_OK);
+			if (Remain_Undo < 0){
+				InsertFlag = FALSE;
+			}
+		}
+		else if (!InsertFlag)
+			MessageBox(hwnd, "저장 되어 있는 \n 되돌림 가능한 공간이 없습니다.", "경고", MB_OK);
+		InvalidateRect(hwnd, NULL, FALSE);
+		break;
+
+	case ID_MENU_RANKING:
+		DialogBox(g_hInstance, MAKEINTERSOURCE(IDO_DIALOG2), hwnd, (DLGPROC)ResultDloProc);
+		break;
+	}
 }
