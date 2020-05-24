@@ -274,6 +274,8 @@ void Init(HWND hwnd)
 	}
 }
 
+// °æ°è¼±
+
 void Main_OnRbuttondown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags){
 	Right_Button_State = TRUE;
 	int Row, Col;
@@ -593,3 +595,55 @@ LRESULT CALLBACK ResultDloProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam
 	}
 	return FALSE;
 }
+
+void CopyBlock(){
+	for (int i = 0; i < Main_ROW; i++){
+		for (int j = 0; j < Main_COL; j++){
+			Block[i][j].IsOpen = Mask[Remain_Undo].Block[i][j].IsOpen;
+			Block[i][j].State = Mask[Remain_Undo].Block[i][j].State;
+		}
+	}
+}
+
+void UndoBlock(){
+	if (Remain_Undo >= 0){
+		CopyBlock();
+		Remain_Undo--;
+	}
+	else{
+		InsertFlag = FALSE;
+	}
+}
+
+void InsertBlock(){
+	if (Undo_Total == 0){
+		InsertFlag = FALSE;
+	}
+	else if (Remain_Undo == Undo_Total - 1){
+		for (int i = 0; i <= Undo_Total - 2; i++){
+			for (int j = 0; j < Main_ROW; j++){
+				for (int k = 0; k < Main_COL; k++){
+					Mask[i].Block[j][k].IsOpen = Mask[i + 1].Block[j][k].IsOpen;
+					Mask[i].Block[j][k].State = Mask[i + 1].Block[j][k].State;
+				}
+			}
+		}
+		for (int j = 0; j < Main_ROW; j++){
+			for (int k = 0; k < Main_COL; k++){
+				Mask[Remain_Undo].Block[j][k].IsOpen = Block[j][k].IsOpen;
+				Mask[Remain_Undo].Block[j][k].State = Block[j][k].State;
+			}
+		}
+	}
+	else{
+		++Remain_Undo;
+		for (int i = 0; i < Main_ROW; i++){
+			for (int j = 0; j < Main_COL; j++){
+				Mask[Remain_Undo].Block[i][j].IsOpen = Block[i][j].IsOpen;
+				Mask[Remain_Undo].Block[i][j].State = Block[i][j].State;
+			}
+		}
+		InsertFlag = TRUE;
+	}
+}
+
