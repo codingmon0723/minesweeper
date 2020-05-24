@@ -732,3 +732,93 @@ void IntToArray(long Number, char* Array){
 	}
 }
 
+void Game_Win(HWND hwnd){
+	int FlagCount = 0;
+	Remain_Mine = Mine_Total;
+	for (int i = 0; i < Main_ROW; i++){
+		for (int j = 0; j < Main_COL; j++){
+			if (Block[i][j].IsOpen == FLAG && Block[i][j].State == BOMB)
+				FlagCount++;
+			if (Block[i][j].IsOpen == FLAG)
+				Remain_Mine--;
+		}
+	}
+	if (FlagCount == Mine_Total && Remain_Mine == 0){
+		Game_Sucessce = TRUE;
+
+		for (int i = 0; i < Main_ROW; i++){
+			for (int j = 0; j < Main_COL; j++){
+				if (Block[i][j].IsOpen == CLOSE && Block[i][j].IsOpen != FLAG)
+					Block[i][j].IsOpen = OPEN;
+			}
+		}
+		GameFailed(hwnd);
+
+		switch (Game_Level){
+		case PRIMARY:
+			if (Highest_Primary_Time >= TimeCount){
+				Highest_Primary_Time = TimeCount;
+				DialogBox(g_hInstance, MAKEINTERSOURCE(IDD_DIALOG1), hwnd, (DLGPROC)RankingDloProc);
+				StringCopy(Highest_Primary_Name);
+			}
+			break;
+		case INTERMEDIATE:
+			if (Highest_Intermediate_Time >= TimeCount){
+				Highest_Intermediate_Time = TimeCount;
+				DialogBox(g_hInstance, MAKEINTERSOURCE(IDD_DIALOG1), hwnd, (DLGPROC)RankingDloProc);
+				StringCopy(Highest_Intermediate_Name);
+			}
+			break;
+		case ADVANCED:
+			if (Highest_Advanced_Time >= TimeCount){
+				Highest_Advanced_Time = TimeCount;
+				DialogBox(g_hInstance, MAKEINTERSOURCE(IDD_DIALOG1), hwnd, (DLGPROC)RankingDloProc);
+				StringCopy(Highest_Advanced_Name);
+			}
+			break;
+		}
+		DialogBox(g_hInstance, MAKEINTERSOURCE(IDD_DIALOG2), hwnd, (DLGPROC)ResultDloProc);
+	}
+}
+
+void Block_Open(HWND hwnd, int Row, int Col){
+	int FlagCount = 0;
+
+	if (Block[Row][Col].IsOpen == QUESTION){
+		if (Block[Row][Col].State == BOMB){
+			Block[Row][Col].IsOpen = OPEN;
+			Game_Sucessce = FALSE;
+			GameFailed(hwnd);
+			MessageBox(hwnd, "게임이 끝났습니다. \n 좀 더 열심히 해주세요.", NULL, MB_OK);
+		}
+		else{
+			if (Block[Row][Col].State == EMPTY){
+				Block[Row][Col].IsOpen = OPEN;
+				Empty_Fine(Row, Col);
+			}
+			else
+				Block[Row][Col].IsOpen = OPEN;
+		}
+	}
+	else if (Block[Row][Col].IsOpen == CLOSE && Block[Row][Col].State == EMPTY){
+		Block[Row][Col].IsOpen = OPEN;
+		Empty_Fine(Row, Col);
+	}
+	else if (Block[Row][Col].IsOpen == CLOSE && Block[Row][Col].State >= ONE && Block[Row][Col].State <= EIGHT){
+		Block[Row][Col].IsOpen = OPEN;
+	}
+	else if (Block[Row][Col].IsOpen == CLOSE && Block[Row][Col].State == BOMB){
+		Block[Row][Col].IsOpen = OPEN;
+		Game_Sucessce = FALSE;
+		GameFailed(hwnd);
+		MessageBox(hwnd, "게임이 끝났습니다. \n 좀 더 열심히 해주세요.", NULL, MB_OK);
+	}
+}
+
+void MenuCheck(HWND hwnd, int ID){
+	HMENU hMenu = GetMenu(hwnd);
+	CheckMenuItem(hMenu, Menu_Checked, MF_UNCHECKED);
+
+	Menu_Checked = ID;
+	CheckMenuItem(hMenu, Menu_Checked, MF_UNCHECKED);
+}
