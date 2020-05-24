@@ -523,3 +523,73 @@ LRESULT CALLBACK RankingDloProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPara
 	}
 	return FALSE;
 }
+
+LRESULT CALLBACK ResultDloProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam){
+	char str[256];
+
+	switch (msg){
+	case WM_INITDIALOG:
+		hDlgMain = hDlg;
+
+		_itoa_s(Highest_Primary_Time, str, 10);
+		strcat_s(str, "초");
+		SetDlgItemText(hDlg, IDC_TIME1, str);
+		strcat_s(str, "초");
+		SetDlgItemText(hDlg, IDC_TIME2, str);
+		strcat_s(str, "초");
+		SetDlgItemText(hDlg, IDC_TIME3, str);
+
+		SetDlgItemText(hDlg, IDC_NAME1, Highest_Primary_Name);
+		SetDlgItemText(hDlg, IDC_NAME2, Highest_Intermediate_Name);
+		SetDlgItemText(hDlg, IDC_NAME3, Highest_Advanced_Name);
+
+		return TRUE;
+	case WM_COMMAND:
+		switch (LOWORD(wParam)){
+		case IDC_BUTTON1:
+			strcpy(Highest_Primary_Name, "익명");
+			strcpy(Highest_Intermediate_Name, "익명");
+			strcpy(Highest_Advanced_Name, "익명");
+
+			Highest_Primary_Time = 999;
+			Highest_Intermediate_Time = 999;
+			Highest_Advanced_Time = 999;
+
+			_itoa(Highest_Primary_Time, str, 10);
+			strcat(str, "초");
+			SetDlgItemText(hDlg, IDC_TIME1, str);
+
+			_itoa(Highest_Intermediate_Time, str, 10);
+			strcat(str, "초");
+			SetDlgItemText(hDlg, IDC_TIME2, str);
+
+			_itoa(Highest_Advanced_Time, str, 10);
+			strcat(str, "초");
+			SetDlgItemText(hDlg, IDC_TIME3, str);
+
+			SetDlgItemText(hDlg, IDC_NAME1, Highest_Primary_Name);
+			SetDlgItemText(hDlg, IDC_NAME2, Highest_Intermediate_Name);
+			SetDlgItemText(hDlg, IDC_NAME3, Highest_Advanced_Name);
+			break;
+
+		case IDOK:
+
+			_itoa(Highest_Primary_Time, str, 10);
+			WritePrivateProfileString("Ranking", "Highest_Primary_Time", str, "Mine.ini");
+
+			_itoa(Highest_Intermediate_Time, str, 10);
+			WritePrivateProfileString("Ranking", "Highest_Intermediate_Time", str, "Mine.ini");
+
+			_itoa(Highest_Advanced_Time, str, 10);
+			WritePrivateProfileString("Ranking", "Highest_Advanced_Time", str, "Mine.ini");
+
+			WritePrivateProfileString("Ranking", "Highest_Primary_Name", Highest_Primary_Name, "Mine.ini");
+			WritePrivateProfileString("Ranking", "Highest_Intermediate_Name", Highest_Intermediate_Name, "Mine.ini");
+			WritePrivateProfileString("Ranking", "Highest_Advanced_Name", Highest_Advanced_Name, "Mine.ini");
+			EndDialog(hDlg, IDOK);
+			break;
+		}
+		return TRUE;
+	}
+	return FALSE;
+}
