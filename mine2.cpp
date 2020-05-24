@@ -647,3 +647,88 @@ void InsertBlock(){
 	}
 }
 
+void StringCopy(char* Name){
+	for (int i = 0; i < 19; i++){
+		Name[i] = User_Name[i];
+	}
+
+	Name[19] = '\0';
+}
+
+void DeleteBlock(){
+	for (int i = 0; i < Undo_Total; i++){
+		for (int j = 0; j < Main_ROW; j++){
+			delete[] Mask[i].Block[j];
+		}
+		delete[] Mask[i].Block;
+	}
+	for (int i = 0; i < Main_ROW; i++){
+		delete[] Block[i];
+	}
+
+	delete[] Mask;
+	delete[] Block;
+}
+
+int MaxMinCheck(int Number, int Kind){
+	switch(Kind){
+	case ROWCOL:
+		if (Number < RowCol.MIN)
+			Number = RowCol.MIN;
+		else if (Number > RowCol.MAX)
+			Number = RowCol.MAX;
+		break;
+	case MINE:
+		if (Number < Mine.MIN)
+			Number = Mine.MIN;
+		else if (Number > Mine.MAX)
+			Number = Mine.MAX;
+		break;
+
+	case UNDO:
+		if (Number < Undo.MIN)
+			Number = Undo.MIN;
+		else if (Number > Undo.MAX)
+			Number = Undo.MAX;
+		break;
+	}
+	return Number;
+}
+
+void GameFailed(HWND hwnd){
+	Game_End = TRUE;
+	KillTimer(hwnd, 1);
+}
+
+void IntToArray(long Number, char* Array){
+	int div = 100;
+	int count = 0;
+	
+	if (Number >= 1000){
+		Number = 999;
+	}
+	
+	if (Number <= -1){
+		Array[0] = '_';
+		Number *= -1;
+		++count;
+		Number %= div;
+		div = 10;
+
+		while (count < 3){
+			Array[count] = Number / div;
+			Number -= div * Array[count];
+			div /= 10;
+			++count;
+		}
+	}
+	else{
+		while (count < 3){
+			Array[count] = Number / div;
+			Number -= div* Array[count];
+			div /= 10;
+			++count;
+		}
+	}
+}
+
