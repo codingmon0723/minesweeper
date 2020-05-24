@@ -486,3 +486,40 @@ LRESULT CALLBACK InfoDloProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam){
 	return FALSE;
 }
 
+LRESULT CALLBACK RankingDloProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam){
+	char str[256];
+	switch (msg){
+	case WM_INITDIALOG:
+		hDlgMain = hDlg;
+
+		SetDlgItemInt(hDlg, IDC_EDIT1, "¿Õ∏Ì");
+
+		switch (Game_Level){
+		case PRIMARY:
+			LoadString(g_hInstance, IDS_STRING1, str, 256);
+			SetDlgItemText(hDlg, IDC_STATIC1, str);
+			break;
+		case INTERMEDIATE:
+			LoadString(g_hInstance, IDS_STRING2, str, 256);
+			SetDlgItemText(hDlg, IDC_STATIC1, str);
+			break;
+		case ADVANCED:
+			LoadString(g_hInstance, IDS_STRING3, str, 256);
+			SetDlgItemText(hDlg, IDC_STATIC1, str);
+			break;
+		}
+		return TRUE;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam)){
+		case IDC_BUTTON1:{
+			SetDlgItemText(hDlgMain, IDC_EDIT1, User_Name, 20);
+			User_Name[19] = '\0';
+			EndDialog(hDlg, IDOK);
+			break;
+		}
+		return TRUE;
+		}
+	}
+	return FALSE;
+}
