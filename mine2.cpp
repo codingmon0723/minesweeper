@@ -101,7 +101,7 @@ BLOCK **Block;
 tagUNDO *Mask;
 
 HINSTANCE g_hInstance;
-LPCWSTR lpszClass = (LPCWSTR)"지뢰찾기";
+LPCSTR lpszClass = (LPCSTR)"지뢰찾기";
 
 RECT Window_Size;
 RECT Game_Size;
@@ -194,9 +194,9 @@ BOOL Main_CnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 
 void Load_Bitmap(void)
 {
-	MineNumber = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_BITMAP2));
-	RedNumber = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_BITMAP3));
-	Smile = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_BITMAP4));
+	MineNumber = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_BITMAP1));
+	RedNumber = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_BITMAP5));
+	Smile = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_BITMAP3));
 }
 
 void Create_Window(HWND hwnd)
@@ -336,7 +336,7 @@ void Main_OnCommand(HWND hwnd, int ID, HWND hwndCtl, UINT codeNotify){
 				InsertFlag = FALSE;
 				InitializeBorder();
 				Init(hwnd);
-				KillTiemr(hwnd, 1);
+				KillTimer(hwnd, 1);
 				TimeCount = 0;
 			}
 		}
@@ -408,7 +408,7 @@ void Main_OnCommand(HWND hwnd, int ID, HWND hwndCtl, UINT codeNotify){
 
 		break;
 	case ID_MENU_USER:
-		if (DialogBox(g_hInstance, MAKEINTERSOURCE(OPTION_DIALOG), hwnd, (DLGPROC)InfoDloProc) == IDOK){
+		if (DialogBox(g_hInstance, MAKEINTRESOURCE(OPTION_DIALOG), hwnd, (DLGPROC)InfoDloProc) == IDOK){
 				MenuCheck(hwnd, ID_MENU_USER);
 				Game_Level = USER;
 				SaveOption();
@@ -473,13 +473,13 @@ LRESULT CALLBACK InfoDloProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam){
 			Main_ROW = MaxMinCheck(GetDlgItemInt(hDlg, IDC_MAIN_ROW, NULL, FALSE), ROWCOL);
 			Main_COL = MaxMinCheck(GetDlgItemInt(hDlg, IDC_MAIN_COL, NULL, FALSE), ROWCOL);
 			Mine.MAX = Main_ROW * Main_COL / 100 * 81;
-			Mine_Total = MaxMinCheck(GetDlgitemInt(hDlg, IDC_MAIN_MINE, NULL, FALSE), MINE);
-			Undo_Total = MaxMinCheck(GetDlgitemInt(hDlg, IDC_MAIN_UNDO, NULL, FALSE), UNDO);
+			Mine_Total = MaxMinCheck(GetDlgItemInt(hDlg, IDC_MAIN_MINE, NULL, FALSE), MINE);
+			Undo_Total = MaxMinCheck(GetDlgItemInt(hDlg, IDC_MAIN_UNDO, NULL, FALSE), UNDO);
 		}
 		EndDialog(hDlg, IDOK);
 		break;
 
-		case ID_CANCEL:
+		case IDCANCEL:
 			EndDialog(hDlg, IDCANCEL);
 			break;
 		}
@@ -494,7 +494,7 @@ LRESULT CALLBACK RankingDloProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPara
 	case WM_INITDIALOG:
 		hDlgMain = hDlg;
 
-		SetDlgItemInt(hDlg, IDC_EDIT1, "익명");
+		SetDlgItemText(hDlg, IDC_EDIT1, "익명");
 
 		switch (Game_Level){
 		case PRIMARY:
@@ -515,7 +515,7 @@ LRESULT CALLBACK RankingDloProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lPara
 	case WM_COMMAND:
 		switch (LOWORD(wParam)){
 		case IDC_BUTTON1:{
-			SetDlgItemText(hDlgMain, IDC_EDIT1, User_Name, 20);
+			GetDlgItemText(hDlgMain, IDC_EDIT1, User_Name, 20);
 			User_Name[19] = '\0';
 			EndDialog(hDlg, IDOK);
 			break;
@@ -758,26 +758,26 @@ void Game_Win(HWND hwnd){
 		case PRIMARY:
 			if (Highest_Primary_Time >= TimeCount){
 				Highest_Primary_Time = TimeCount;
-				DialogBox(g_hInstance, MAKEINTERSOURCE(IDD_DIALOG1), hwnd, (DLGPROC)RankingDloProc);
+				DialogBox(g_hInstance, MAKEINTRESOURCE(IDD_DIALOG1), hwnd, (DLGPROC)RankingDloProc);
 				StringCopy(Highest_Primary_Name);
 			}
 			break;
 		case INTERMEDIATE:
 			if (Highest_Intermediate_Time >= TimeCount){
 				Highest_Intermediate_Time = TimeCount;
-				DialogBox(g_hInstance, MAKEINTERSOURCE(IDD_DIALOG1), hwnd, (DLGPROC)RankingDloProc);
+				DialogBox(g_hInstance, MAKEINTRESOURCE(IDD_DIALOG1), hwnd, (DLGPROC)RankingDloProc);
 				StringCopy(Highest_Intermediate_Name);
 			}
 			break;
 		case ADVANCED:
 			if (Highest_Advanced_Time >= TimeCount){
 				Highest_Advanced_Time = TimeCount;
-				DialogBox(g_hInstance, MAKEINTERSOURCE(IDD_DIALOG1), hwnd, (DLGPROC)RankingDloProc);
+				DialogBox(g_hInstance, MAKEINTRESOURCE(IDD_DIALOG1), hwnd, (DLGPROC)RankingDloProc);
 				StringCopy(Highest_Advanced_Name);
 			}
 			break;
 		}
-		DialogBox(g_hInstance, MAKEINTERSOURCE(IDD_DIALOG2), hwnd, (DLGPROC)ResultDloProc);
+		DialogBox(g_hInstance, MAKEINTRESOURCE(IDD_DIALOG2), hwnd, (DLGPROC)ResultDloProc);
 	}
 }
 
