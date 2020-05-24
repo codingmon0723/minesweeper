@@ -8,4 +8,11 @@
 #include <math.h>
 #include "resource.h"
 
-//test
+void Main_OnRbuttondown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags){
+	Right_Button_State = TRUE;
+	int Row, Col;
+	int cnt = 0;
+	Right_Button_Down = FALSE;
+
+
+}
