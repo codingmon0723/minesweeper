@@ -465,20 +465,21 @@ LRESULT CALLBACK InfoDloProc(HWND hDlg, UINT msg, WPARAM wParam, LPARAM lParam){
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam)){
-			case IDOK{
-				DeleteBlock();
-				Main_ROW = MaxMinCheck(GetDlgItemInt(hDlg, IDC_MAIN_ROW, NULL, FALSE), ROWCOL);
-				Main_COL = MaxMinCheck(GetDlgItemInt(hDlg, IDC_MAIN_COL, NULL, FALSE), ROWCOL);
-				Mine.MAX = Main_ROW * Main_COL / 100 * 81;
-				Mine_Total = MaxMinCheck(GetDlgitemInt(hDlg, IDC_MAIN_MINE, NULL, FALSE), MINE);
-				Undo_Total = MaxMinCheck(GetDlgitemInt(hDlg, IDC_MAIN_UNDO, NULL, FALSE), UNDO);
-			}
-			EndDialog(hDlg, IDOK);
-			break;
+		case IDOK:
+		{
+			DeleteBlock();
+			Main_ROW = MaxMinCheck(GetDlgItemInt(hDlg, IDC_MAIN_ROW, NULL, FALSE), ROWCOL);
+			Main_COL = MaxMinCheck(GetDlgItemInt(hDlg, IDC_MAIN_COL, NULL, FALSE), ROWCOL);
+			Mine.MAX = Main_ROW * Main_COL / 100 * 81;
+			Mine_Total = MaxMinCheck(GetDlgitemInt(hDlg, IDC_MAIN_MINE, NULL, FALSE), MINE);
+			Undo_Total = MaxMinCheck(GetDlgitemInt(hDlg, IDC_MAIN_UNDO, NULL, FALSE), UNDO);
+		}
+		EndDialog(hDlg, IDOK);
+		break;
 
-			case ID_CANCEL:
-				EndDialog(hDlg, IDCANCEL);
-				break;
+		case ID_CANCEL:
+			EndDialog(hDlg, IDCANCEL);
+			break;
 		}
 		return TRUE;
 	}
